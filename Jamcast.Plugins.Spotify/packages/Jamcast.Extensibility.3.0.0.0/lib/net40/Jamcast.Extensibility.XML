@@ -1,0 +1,1185 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>Jamcast.Extensibility</name>
+    </assembly>
+    <members>
+        <member name="P:Jamcast.Extensibility.Metadata.StreamProperties.Format">
+            <summary>
+            Gets the MediaFormat of this stream.
+            </summary>
+        </member>
+        <member name="P:Jamcast.Extensibility.Metadata.StreamProperties.MimeType">
+            <summary>
+            Gets the MIME type.
+            </summary>        
+        </member>
+        <member name="T:Jamcast.Extensibility.IContentDirectoryPlugin">
+            <summary>
+            This interface defines a Jamcast plugin and is the starting point of every plugin project.
+            </summary>
+        </member>
+        <member name="M:Jamcast.Extensibility.IContentDirectoryPlugin.Startup">
+            <summary>
+            Called by the server upon loading the plugin for the first time.  Use this entry point to perform any private initialization operations.  If this function returns False or an exception is thrown the plugin will not be loaded.
+            </summary>
+            <returns>A boolean value that indicates whether or not the plugin can initialize.  If returns false, the plugin will not be rendered within the content directory.</returns>
+        </member>
+        <member name="M:Jamcast.Extensibility.IContentDirectoryPlugin.Shutdown">
+            <summary>
+            Called by the server during shutdown.  Use this entry point to free any resources that need to be released explicitly.
+            </summary>
+        </member>
+        <member name="P:Jamcast.Extensibility.IContentDirectoryPlugin.RootObjectRendererType">
+            <summary>
+            Returns the Type of object renderer that will emit metadata for the root of this plugin.
+            </summary>
+        </member>
+        <member name="P:Jamcast.Extensibility.IContentDirectoryPlugin.ConfigurationPanelType">
+            <summary>
+            Returns the Type of a <see cref="!:Jamcast.Extensibility.ConfigurationPanel"/> implementation that will be instantiated and presented to the user from within Jamcast Server Manager.  Return null if no user interface is provided.
+            </summary>
+        </member>
+        <member name="M:Jamcast.Extensibility.UI.ConfigurationPanel.SetIsDirty">
+            <summary>
+            Call this method from within a derived class to notify Server Manager that the user has
+            modified your plugin's configuration via the UI.  The user will be notified of unsaved changes 
+            if they try to exit Server Manager.
+            </summary>
+        </member>
+        <member name="M:Jamcast.Extensibility.UI.ConfigurationPanel.OnSave">
+            <summary>
+            When overriden, this method is an appropriate place to save any changes.  This is called when the user clicks the Apply button in Jamcast Server Manager.
+            </summary>
+        </member>
+        <member name="M:Jamcast.Extensibility.UI.ConfigurationPanel.OnServiceAvailable">
+            <summary>
+            When overridden in a derived class, this method will be called when the Jamcast service becomes available.
+            </summary>
+        </member>
+        <member name="M:Jamcast.Extensibility.UI.ConfigurationPanel.OnServiceUnavailable">
+            <summary>
+            When overridden in a derived class, this method will be called when the Jamcast service stops.
+            </summary>
+        </member>
+        <member name="T:Jamcast.Extensibility.ContentDirectory.ContainerRenderer">
+            <summary>
+            In addition to emitting their own metadata, instances of ContainerRenderer are responsible for creating child objects within the Content Directory.
+            To create child objects, prepare your return data in PrepareGetChildren(), then handle GetChildAt() to instantiate and return each requested child object.
+            </summary>
+        </member>
+        <member name="T:Jamcast.Extensibility.ContentDirectory.ObjectRenderer">
+            <summary>
+            Jamcast emits an object's metadata within the Content Directory by creating an instance of ObjectRenderer and calling its GetMetadata method.  Your various implementations of ObjectRenderer should override the GetMetadata method and return an instance of a class that derives from <see cref="T:Jamcast.Extensibility.Metadata.ServerObject"/> based on the persistence value read from the ObjectData property.
+            </summary>
+            <seealso cref="T:Jamcast.Extensibility.ContentDirectory.ContainerRenderer"/>
+        </member>
+        <member name="T:Jamcast.Extensibility.ContentDirectory.IObjectRenderer">
+            <summary>
+            This interface defines a Content Directory object renderer.
+            </summary>
+        </member>
+        <member name="M:Jamcast.Extensibility.ContentDirectory.IObjectRenderer.GetMetadata">
+            <summary>
+            Returns the object metadata emitted by this instance.
+            </summary>        
+            <returns>An instance derived from <see cref="T:Jamcast.Extensibility.Metadata.ServerObject"/> containing the relevant object metadata.</returns>
+        </member>
+        <member name="M:Jamcast.Extensibility.ContentDirectory.ObjectRenderer.GetMetadata">
+            <summary>
+            Returns the object metadata handled by this instance.
+            </summary>
+            <returns>An instance derived from <see cref="T:Jamcast.Extensibility.Metadata.ServerObject"/> containing the relevant object metadata.</returns>
+        </member>
+        <member name="P:Jamcast.Extensibility.ContentDirectory.ObjectRenderer.ObjectData">
+            <summary>
+            Gets the data representing the request object.
+            </summary>
+        </member>
+        <member name="P:Jamcast.Extensibility.ContentDirectory.ObjectRenderer.BrowseFilter">
+            <summary>
+            Gets an <see cref="!:System.Collections.Generic.IList"/> containing the array of object attributes requested by the device.  If an
+            attribute is not present here, it is not necessary to return corresponding metadata.
+            Checking the BrowseFilter property can help you avoid making unnecessary database / remote
+            resource requests.  Compare these values to the constants found in <see cref="T:Jamcast.Extensibility.Metadata.ServerObjectProperties"/>.
+            </summary>
+        </member>
+        <member name="M:Jamcast.Extensibility.ContentDirectory.ContainerRenderer.PrepareGetChildren(System.Int32,System.Int32)">
+            <summary>
+            Jamcast calls this function once per browse request for a container's children. The ContainerRenderer should do what
+            it needs here in order to initialize data that will be returned to the client. 
+            </summary>
+            <param name="startIndex">The starting index for this browse request, if paging. </param>
+            <param name="count">The number of objects requests</param>
+            <returns>The requested container's total number of direct child objects.</returns>
+        </member>
+        <member name="M:Jamcast.Extensibility.ContentDirectory.ContainerRenderer.GetChildAt(System.Int32)">
+            <summary>
+            Jamcast calls this function once per item in the requested page.
+            </summary>
+            <param name="index">The index of the requested object.</param>
+            <returns>A new instance of ObjectRenderInfo that contains the rendering type and object data for the requested object.</returns>
+        </member>
+        <member name="M:Jamcast.Extensibility.ContentDirectory.ContainerRenderer.EndGetChildren">
+            <summary>
+            Optional override to clean up resources, guaranteed to be called following a request to render child objects.
+            </summary>
+        </member>
+        <member name="T:Jamcast.Extensibility.ContentDirectory.ObjectRenderInfo">
+            <summary>
+            This class describes how a distinct server object can be rendered within the content directory by calling into an instance of ObjectRenderer and supplying the corresponding persistence data.
+            </summary>    
+        </member>
+        <member name="M:Jamcast.Extensibility.ContentDirectory.ObjectRenderInfo.#ctor(System.Type,System.Object)">
+            <summary>
+            Creates a new instance of ObjectRenderInfo.
+            </summary>        
+            <param name="data">The persistence data to be passed to the object renderer.</param>
+            <param name="rendererType">The Type of the object renderer that will emit metadata for the specified persistence data.</param>
+        </member>
+        <member name="M:Jamcast.Extensibility.ContentDirectory.ObjectRenderInfo.#ctor(System.Type)">
+            <summary>
+            Creates a new instance of ObjectRenderInfo with no persistence data supplied.
+            </summary>     
+            <param name="rendererType">The Type of the object renderer that will emit metadata for the specified persistence data.</param>
+        </member>
+        <member name="P:Jamcast.Extensibility.ContentDirectory.ObjectRenderInfo.RendererType">
+            <summary>
+            Gets the Type of object renderer to be invoked for this object.
+            </summary>
+        </member>
+        <member name="P:Jamcast.Extensibility.ContentDirectory.ObjectRenderInfo.ObjectData">
+            <summary>
+            Gets the persistence data to be passed to the object renderer.
+            </summary>
+        </member>
+        <member name="T:Jamcast.Extensibility.MediaServer.AudioRequestInitializationResult">
+            <summary>
+            Encapsulates metadata required by the media server to initialize streaming of an audio item.
+            </summary>
+        </member>
+        <member name="T:Jamcast.Extensibility.MediaServer.RequestInitializationResult">
+            <summary>
+            Provides metadata from a handler to the media server as it prepares a resource for streaming.
+            </summary>
+        </member>
+        <member name="P:Jamcast.Extensibility.MediaServer.RequestInitializationResult.IsConversion">
+            <summary>
+            Gets or sets a flag indicating whether or not this resource will be converted from its native format.        
+            </summary>
+        </member>
+        <member name="P:Jamcast.Extensibility.MediaServer.RequestInitializationResult.TotalBytes">
+            <summary>
+            Gets or sets the total number of bytes in the requested resource, or 0 if the size unknown.
+            </summary>
+        </member>
+        <member name="P:Jamcast.Extensibility.MediaServer.RequestInitializationResult.CanProceed">
+            <summary>
+            Gets or sets a flag indicating whether or not the media server can continue to process this request.  Set this to false to indicate that 
+            an error occurred during initialization and the request cannot be processed.
+            </summary>
+        </member>
+        <member name="P:Jamcast.Extensibility.MediaServer.RequestInitializationResult.SupportsSeeking">
+            <summary>
+            Gets or sets a flag indicating whether or not this resource is seekable.
+            </summary>
+        </member>
+        <member name="P:Jamcast.Extensibility.MediaServer.AudioRequestInitializationResult.InputProperties">
+            <summary>
+            Gets or sets an instance of AudioStreamProperties to describe the audio stream being prepared.  This metadata is essential to the audio trancoder -- if transcoding for this resource is desired, this property must be non-null.
+            </summary>
+        </member>
+        <member name="T:Jamcast.Extensibility.Log">
+            <summary>
+            The Log class provides plugins with the ability to write to the log file.
+            </summary>
+        </member>
+        <member name="M:Jamcast.Extensibility.Log.Trace(System.String,System.String,System.Object[])">
+            <summary>
+            Writes a formatted trace (verbose) message to the logfile.
+            </summary>
+            <param name="module">The name of the module logging this event.</param>
+            <param name="message">A message containing optional format tokens.</param>
+            <param name="args">Optional param array of type System.Object to pass to the formatter.</param>
+        </member>
+        <member name="M:Jamcast.Extensibility.Log.Debug(System.String,System.String,System.Object[])">
+            <summary>
+            Writes a formatted debug message to the logfile.
+            </summary>
+            <param name="module">The name of the module logging this event.</param>
+            <param name="message">A message containing optional format tokens.</param>
+            <param name="args">Optional param array of type System.Object to pass to the formatter.</param>
+        </member>
+        <member name="M:Jamcast.Extensibility.Log.Info(System.String,System.String,System.Object[])">
+            <summary>
+            Writes a formatted information message to the logfile.
+            </summary>
+            <param name="module">The name of the module logging this event.</param>
+            <param name="message">A message containing optional format tokens.</param>
+            <param name="args">Optional param array of type System.Object to pass to the formatter.</param>
+        </member>
+        <member name="M:Jamcast.Extensibility.Log.Warning(System.String,System.String,System.Object[])">
+            <summary>
+            Writes a formatted warning message to the logfile.
+            </summary>
+            <param name="module">The name of the module logging this event.</param>
+            <param name="message">A message containing optional format tokens.</param>
+            <param name="args">Optional param array of type System.Object to pass to the formatter.</param>
+        </member>
+        <member name="M:Jamcast.Extensibility.Log.Warning(System.String,System.String,System.Exception)">
+            <summary>
+            Writes a warning message to the logfile with exception.
+            </summary>
+            <param name="module">The name of the module logging this event.</param>
+            <param name="message">A message to be written to the logfile.</param>
+            <param name="ex">Instance of System.Exception that will be printed to the end of the provided message.</param>
+        </member>
+        <member name="M:Jamcast.Extensibility.Log.Error(System.String,System.String,System.Object[])">
+            <summary>
+            Writes a formatted error message to the logfile.
+            </summary>
+            <param name="module">The name of the module logging this event.</param>
+            <param name="message">A message containing optional format tokens.</param>
+            <param name="args">Optional param array of type System.Object to pass to the formatter.</param>
+        </member>
+        <member name="M:Jamcast.Extensibility.Log.Error(System.String,System.String,System.Exception)">
+            <summary>
+            Writes an error message to the logfile with exception.
+            </summary>
+            <param name="module">The name of the module logging this event.</param>
+            <param name="message">A message to be written to the logfile.</param>
+            <param name="ex">Instance of System.Exception that will be printed to the end of the provided message.</param>
+        </member>
+        <member name="T:Jamcast.Extensibility.MediaServer.BadMediaRequestException">
+            <summary>
+            Throw this exception when a media request handler cannot process the current request due to bad parameters, etc.  The media server will respond with an HTTP 400 error.
+            </summary>
+        </member>
+        <member name="M:Jamcast.Extensibility.MediaServer.BadMediaRequestException.#ctor">
+            <summary>
+            Initializes a new instance of the BadMediaRequestException class.
+            </summary>
+        </member>
+        <member name="M:Jamcast.Extensibility.MediaServer.BadMediaRequestException.#ctor(System.String)">
+            <summary>
+            Initializes a new instance of the BadMediaRequestException class with a specified error message.
+            </summary>
+            <param name="message">The error message that explains the reason for the exception. </param>
+        </member>
+        <member name="M:Jamcast.Extensibility.MediaServer.BadMediaRequestException.#ctor(System.String,System.Exception)">
+            <summary>
+            Initializes a new instance of the BadMediaRequestException class with a specified error message and a refrence to the inner exception that is the cause of this exception.
+            </summary>
+            <param name="message">The error message that explains the reason for the exception.</param>
+            <param name="innerException">The exception that is the cause of the current exception.</param>
+        </member>
+        <member name="T:Jamcast.Extensibility.MediaServer.MediaNotFoundException">
+            <summary>
+            This exception should be thrown when a request handler cannot locate the media corresponding to the parameters received in the request.
+            </summary>
+        </member>
+        <member name="M:Jamcast.Extensibility.MediaServer.MediaNotFoundException.#ctor">
+            <summary>
+            Initializes a new instance of the MediaNotFoundException class.
+            </summary>
+        </member>
+        <member name="M:Jamcast.Extensibility.MediaServer.MediaNotFoundException.#ctor(System.String)">
+            <summary>
+            Initializes a new instance of the MediaNotFoundException class with a specified error message.
+            </summary>
+            <param name="message">The error message that explains the reason for the exception. </param>
+        </member>
+        <member name="M:Jamcast.Extensibility.MediaServer.MediaNotFoundException.#ctor(System.String,System.Exception)">
+            <summary>
+            Initializes a new instance of the MediaNotFoundException class with a specified error message and a refrence to the inner exception that is the cause of this exception.
+            </summary>
+            <param name="message">The error message that explains the reason for the exception.</param>
+            <param name="innerException">The exception that is the cause of the current exception.</param>
+        </member>
+        <member name="T:Jamcast.Extensibility.MediaServer.MediaRequestHandler">
+            <summary>
+            Classes that derive from MediaRequestHandler provide custom functionality to service streaming media requests from network clients.
+            </summary>
+        </member>
+        <member name="M:Jamcast.Extensibility.MediaServer.MediaRequestHandler.RetrieveMedia">
+            <summary>
+            This method is called when the media server is ready to begin sending data.  You should initialize and return an instance of DataPipeBase that will provide audio data to the client.
+            </summary>
+            <returns>An instance of DataPipeBase that will provide the response data for this request.</returns>
+        </member>
+        <member name="M:Jamcast.Extensibility.MediaServer.MediaRequestHandler.Initialize">
+            <summary>
+            This method is called by the media server when preparing to stream audio data to the client.  You should return an instance of RequestInitializationResult that describes the media that will be sent to the client.
+            </summary>
+            <returns>An instance of RequestInitializationResult that provides information about the audio stream to be sent in the response.</returns>
+        </member>
+        <member name="M:Jamcast.Extensibility.MediaServer.MediaRequestHandler.OnRequestCompleted(System.Int64)">
+            <summary>
+            This method is called by the server when streaming is completed.
+            </summary>
+            <param name="bytesSent">The total number of bytes that were sent to the network client.</param>
+        </member>
+        <member name="P:Jamcast.Extensibility.MediaServer.MediaRequestHandler.Context">
+            <summary>
+            An instance of MediaRequestContext corresponding to the current request.
+            </summary>
+        </member>
+        <member name="T:Jamcast.Extensibility.MediaServer.MediaRequestContext">
+            <summary>
+            Provides contextual metadata about a specific request to the media server.
+            </summary>
+        </member>
+        <member name="P:Jamcast.Extensibility.MediaServer.MediaRequestContext.Format">
+            <summary>
+            Gets the requested media format.
+            </summary>
+        </member>
+        <member name="P:Jamcast.Extensibility.MediaServer.MediaRequestContext.Data">
+            <summary>
+            Gets an array of String representing the data that was passed to the media server.  This data should 
+            contain the metadata necessary to retrieve the data being requested.
+            </summary>
+        </member>
+        <member name="T:Jamcast.Extensibility.Metadata.ServerObjectProperties">
+            <summary>
+            This class defines the string constants for object properties recognized by Jamcast.  These
+            constants should be used when evaluating the browseFilter parameter in your Content Directory object
+            renderer implementations.
+            </summary>
+        </member>
+        <member name="F:Jamcast.Extensibility.Metadata.ServerObjectProperties.ALL">
+            <summary>
+            All properties
+            </summary>
+        </member>
+        <member name="F:Jamcast.Extensibility.Metadata.ServerObjectProperties.TITLE">
+            <summary>
+            Title
+            </summary>
+        </member>
+        <member name="F:Jamcast.Extensibility.Metadata.ServerObjectProperties.ALBUM_ARTIST">
+            <summary>
+            Album artist name
+            </summary>
+        </member>
+        <member name="F:Jamcast.Extensibility.Metadata.ServerObjectProperties.DATE">
+            <summary>
+            Date
+            </summary>
+        </member>
+        <member name="F:Jamcast.Extensibility.Metadata.ServerObjectProperties.ARTIST">
+            <summary>
+            Artist name
+            </summary>
+        </member>
+        <member name="F:Jamcast.Extensibility.Metadata.ServerObjectProperties.ARTIST_ROLE">
+            <summary>
+            Artist role
+            </summary>
+        </member>
+        <member name="F:Jamcast.Extensibility.Metadata.ServerObjectProperties.ALBUM">
+            <summary>
+            Album name
+            </summary>
+        </member>
+        <member name="F:Jamcast.Extensibility.Metadata.ServerObjectProperties.ALBUM_ART_URI">
+            <summary>
+            Album art URI
+            </summary>
+        </member>
+        <member name="F:Jamcast.Extensibility.Metadata.ServerObjectProperties.TRACK_NUMBER">
+            <summary>
+            Track number
+            </summary>
+        </member>
+        <member name="F:Jamcast.Extensibility.Metadata.ServerObjectProperties.GENRE">
+            <summary>
+            Genre name
+            </summary>
+        </member>
+        <member name="F:Jamcast.Extensibility.Metadata.ServerObjectProperties.COMPOSER">
+            <summary>
+            Composer name
+            </summary>
+        </member>
+        <member name="F:Jamcast.Extensibility.Metadata.ServerObjectProperties.RES_SIZE">
+            <summary>
+            Resource size (in bytes)
+            </summary>
+        </member>
+        <member name="F:Jamcast.Extensibility.Metadata.ServerObjectProperties.RES_BITRATE">
+            <summary>
+            Resource bitrate (bytes/sec)
+            </summary>        
+        </member>
+        <member name="F:Jamcast.Extensibility.Metadata.ServerObjectProperties.RES_DURATION">
+            <summary>
+            Resource duration (H:mm:ss.nnn)
+            </summary>
+        </member>
+        <member name="F:Jamcast.Extensibility.Metadata.ServerObjectProperties.RES_NUM_CHANNELS">
+            <summary>
+            Resource number of channels
+            </summary>
+        </member>
+        <member name="F:Jamcast.Extensibility.Metadata.ServerObjectProperties.RES_SAMPLE_SIZE">
+            <summary>
+            Resource bits per sample
+            </summary>
+        </member>
+        <member name="F:Jamcast.Extensibility.Metadata.ServerObjectProperties.RES_SAMPLE_RATE">
+            <summary>
+            Resource sample frequency (rate)
+            </summary>
+        </member>
+        <member name="F:Jamcast.Extensibility.Metadata.ServerObjectProperties.RES_PROTECTION">
+            <summary>
+            Resource protection
+            </summary>
+        </member>
+        <member name="T:Jamcast.Extensibility.Metadata.UriLocation">
+            <summary>
+            Describes a location accessible via a Uri.
+            </summary>
+        </member>
+        <member name="T:Jamcast.Extensibility.Metadata.ResourceLocation">
+            <summary>
+            Defines an abstract location from which a media stream can be acquired.
+            </summary>
+        </member>
+        <member name="M:Jamcast.Extensibility.Metadata.UriLocation.#ctor(System.String)">
+            <summary>
+            Initializes a new instance of the UriLocation class.
+            </summary>
+            <param name="uri">A string representing the location of this instance.</param>
+        </member>
+        <member name="M:Jamcast.Extensibility.Metadata.UriLocation.#ctor(System.Uri)">
+            <summary>
+            Initializes a new instance of the UriLocation class.
+            </summary>
+            <param name="uri">A Uri representing the location of this instance.</param>
+        </member>
+        <member name="M:Jamcast.Extensibility.Metadata.UriLocation.ToString">
+            <summary>
+            Returns a string representation of this instance.
+            </summary>
+            <returns>A string representation of this instance.</returns>
+        </member>
+        <member name="P:Jamcast.Extensibility.Metadata.UriLocation.Uri">
+            <summary>
+            Gets the Uri associated with this instance.
+            </summary>
+        </member>
+        <member name="T:Jamcast.Extensibility.Metadata.AlbumContainer">
+            <summary>
+            Represents an album container the in object tree.  AlbumContainer extends <see cref="T:Jamcast.Extensibility.Metadata.GenericContainer"/> by adding artist and album art metadata.
+            </summary>
+        </member>
+        <member name="T:Jamcast.Extensibility.Metadata.GenericContainer">
+            <summary>
+            The GenericContainer class describes a container object present within the Jamcast Content Directory Service object tree.
+            </summary>
+        </member>
+        <member name="T:Jamcast.Extensibility.Metadata.ServerObject">
+            <summary>
+            Abstract class that defines objects with metadata present within the Content Directory object tree.  
+            </summary>
+        </member>
+        <member name="P:Jamcast.Extensibility.Metadata.ServerObject.Title">
+            <summary>
+            Gets or sets the title of this instance.
+            </summary>
+        </member>
+        <member name="M:Jamcast.Extensibility.Metadata.GenericContainer.#ctor(System.String)">
+            <summary>
+            Creates a new instance of the Container class.
+            </summary>
+            <param name="title">The display title of this instance</param>
+        </member>
+        <member name="M:Jamcast.Extensibility.Metadata.GenericContainer.#ctor(System.String,Jamcast.Extensibility.Metadata.ImageResource)">
+            <summary>
+            Creates a new instance of the Container class.
+            </summary>
+            <param name="title">The display title of this instance</param>
+            <param name="image">The image resource associated with this container</param>
+        </member>
+        <member name="P:Jamcast.Extensibility.Metadata.GenericContainer.AlbumArt">
+            <summary>
+            Gets the ImageResource instance for this container's album art, or null if no album art specified.
+            </summary>
+        </member>
+        <member name="M:Jamcast.Extensibility.Metadata.AlbumContainer.#ctor(System.String,System.String,Jamcast.Extensibility.Metadata.ImageResource)">
+            <summary>
+            Initializes a new instance of the AlbumContainerClass with specified metadata
+            </summary>
+            <param name="title">The title of the album.</param>
+            <param name="artistName">The album artist.</param>
+            <param name="albumArt">An instance of ImageResource that describes the album art image resource, or null if no album art specified.</param>
+        </member>
+        <member name="P:Jamcast.Extensibility.Metadata.AlbumContainer.ArtistName">
+            <summary>
+            Gets the artist's name.
+            </summary>
+        </member>
+        <member name="T:Jamcast.Extensibility.Metadata.AudioItem">
+            <summary>
+            The AudioItem class describes an instance of a playable audio item present within the Content Directory object tree.
+            </summary>
+        </member>
+        <member name="T:Jamcast.Extensibility.Metadata.IMediaItem">
+            <summary>
+            Represents the interface for a streamable media item that can be represented within the Content Directory object tree.
+            </summary>
+        </member>
+        <member name="P:Jamcast.Extensibility.Metadata.IMediaItem.Title">
+            <summary>
+            Gets or sets the title of this item.
+            </summary>
+        </member>
+        <member name="P:Jamcast.Extensibility.Metadata.IMediaItem.Resources">
+            <summary>
+            Gets an array of IMediaResource describing all of the available distinct resources for this media item.
+            </summary>
+        </member>
+        <member name="M:Jamcast.Extensibility.Metadata.AudioItem.#ctor(Jamcast.Extensibility.Metadata.ResourceLocation,Jamcast.Extensibility.Metadata.MediaFormat)">
+            <summary>
+            Initializes a new instance of the AudioItem class.
+            </summary>
+            <param name="location">An instance of ResourceLocation that describes where the resource stream can be retrieved from.</param>
+            <param name="format">A valid audio instance of MediaFormat corresponding to the resource stream.</param>
+        </member>
+        <member name="M:Jamcast.Extensibility.Metadata.AudioItem.CreateResource(Jamcast.Extensibility.Metadata.ResourceLocation,Jamcast.Extensibility.Metadata.MediaFormat)">
+            <summary>
+            Creates a resource for this AudioItem.
+            </summary>
+            <param name="location">An instance of ResourceLocation describing the location of the new resource.</param>
+            <param name="format">The MediaFormat of the new resource.</param>
+            <returns>The newly create instance of AudioResource.</returns>
+        </member>
+        <member name="P:Jamcast.Extensibility.Metadata.AudioItem.Resources">
+            <summary>
+            Gets an array of IMediaResource for all available resources for this item.
+            </summary>
+        </member>
+        <member name="P:Jamcast.Extensibility.Metadata.AudioItem.PrimaryResource">
+            <summary>
+            Gets the primary AudioResource for this item.  Typically this would be the native format.
+            </summary>
+        </member>
+        <member name="P:Jamcast.Extensibility.Metadata.AudioItem.AlbumArt">
+            <summary>
+            Gets or sets the album art for this item.
+            </summary>
+        </member>
+        <member name="P:Jamcast.Extensibility.Metadata.AudioItem.Title">
+            <summary>
+            The track title or description of this audio stream.  This property has the default value of "Untitled".
+            </summary>
+        </member>
+        <member name="P:Jamcast.Extensibility.Metadata.AudioItem.Artists">
+            <summary>
+            Returns an IList of type System.String used to store the performing artist names associated with this instance.
+            </summary>
+        </member>
+        <member name="P:Jamcast.Extensibility.Metadata.AudioItem.Album">
+            <summary>
+            Gets or sets the album title for this instance.
+            </summary>
+        </member>
+        <member name="P:Jamcast.Extensibility.Metadata.AudioItem.AlbumArtist">
+            <summary>
+            Gets or sets the album artist for this instance.
+            </summary>
+        </member>
+        <member name="P:Jamcast.Extensibility.Metadata.AudioItem.Seconds">
+            <summary>
+            Gets or sets the number of seconds of this AudioItem, or 0 if the duration is unknown.
+            </summary>
+        </member>
+        <member name="P:Jamcast.Extensibility.Metadata.AudioItem.Composers">
+            <summary>
+            Returns an IList of type System.String used to store the names of composers associated with this instance.
+            </summary>
+        </member>
+        <member name="P:Jamcast.Extensibility.Metadata.AudioItem.Genre">
+            <summary>
+            Gets or sets the genre name for this instance.
+            </summary>
+        </member>
+        <member name="P:Jamcast.Extensibility.Metadata.AudioItem.TrackNumber">
+            <summary>
+            Gets or sets the track number for this instance.  A value of 0 indicates that the track number is unknown.
+            </summary>
+        </member>
+        <member name="P:Jamcast.Extensibility.Metadata.AudioItem.CreateDate">
+            <summary>
+            Gets or sets the year in which this track was created.  A value of null indicates that the creation year is unknown.
+            </summary>
+        </member>
+        <member name="P:Jamcast.Extensibility.Metadata.AudioItem.IsProtected">
+            <summary>
+            Gets or sets a value indicating whether this track is protected by Windows Media Digital Rights Management.
+            </summary>
+        </member>
+        <member name="T:Jamcast.Extensibility.Metadata.AudioResource">
+            <summary>
+            Instances of AudioResource describe an audio stream having a distinct location and format.
+            </summary>
+        </member>
+        <member name="T:Jamcast.Extensibility.Metadata.IMediaResource">
+            <summary>
+            This interface describes a streamable media resource having a distinct location and format.
+            </summary>
+        </member>
+        <member name="P:Jamcast.Extensibility.Metadata.IMediaResource.Location">
+            <summary>
+            Gets an instance of ResourceLocation describing this resource's location.
+            </summary>
+        </member>
+        <member name="P:Jamcast.Extensibility.Metadata.IMediaResource.Format">
+            <summary>
+            Gets the MediaFormat of this resource.
+            </summary>
+        </member>
+        <member name="P:Jamcast.Extensibility.Metadata.IMediaResource.Length">
+            <summary>
+            Gets or sets this resource's length, in bytes, or 0 if unknown.
+            </summary>
+        </member>
+        <member name="P:Jamcast.Extensibility.Metadata.AudioResource.Location">
+            <summary>
+            Gets an instance of ResourceLocation describing this resource's location.
+            </summary>
+        </member>
+        <member name="P:Jamcast.Extensibility.Metadata.AudioResource.Format">
+            <summary>
+            Gets the MediaFormat of this resource.
+            </summary>
+        </member>
+        <member name="P:Jamcast.Extensibility.Metadata.AudioResource.Properties">
+            <summary>
+            Gets the AudioStreamProperties associated with this instance.
+            </summary>
+        </member>
+        <member name="P:Jamcast.Extensibility.Metadata.AudioResource.Length">
+            <summary>
+            Gets or sets this resource's length, in bytes, or 0 if unknown.
+            </summary>
+        </member>
+        <member name="T:Jamcast.Extensibility.Metadata.AudioStreamProperties">
+            <summary>
+            Describes the properties for a specific audio stream.
+            </summary>
+        </member>
+        <member name="M:Jamcast.Extensibility.Metadata.AudioStreamProperties.#ctor(Jamcast.Extensibility.Metadata.MediaFormat)">
+            <summary>
+            Initializes a new instance of the AudioStreamProperties class with specified format.
+            </summary>
+            <param name="format">A instance of MediaFormat that represents a valid audio format.</param>
+        </member>
+        <member name="P:Jamcast.Extensibility.Metadata.AudioStreamProperties.SampleRate">
+            <summary>
+            Gets or sets the audio sample rate in bits per second.
+            </summary>
+        </member>
+        <member name="P:Jamcast.Extensibility.Metadata.AudioStreamProperties.Bitrate">
+            <summary>
+            Gets or sets the audio bitrate.
+            </summary>        
+        </member>
+        <member name="P:Jamcast.Extensibility.Metadata.AudioStreamProperties.NumberChannels">
+            <summary>
+            Gets the sets number of audio channels.
+            </summary>
+        </member>
+        <member name="P:Jamcast.Extensibility.Metadata.AudioStreamProperties.BitsPerSample">
+            <summary>
+            Gets or sets the sample size.
+            </summary>
+        </member>
+        <member name="T:Jamcast.Extensibility.Metadata.DlnaInfo">
+            <summary>
+            Represents resource-specific metadata defined by the DLNA specification.  This metadata, when present, 
+            is rendered to DLNA-compatible clients only.
+            </summary>
+        </member>
+        <member name="M:Jamcast.Extensibility.Metadata.DlnaInfo.ToString">
+            <summary>
+            Returns a string representation of this DlnaInfo instance.
+            </summary>
+            <returns>A string representation of this DlnaInfo instance.</returns>
+        </member>
+        <member name="P:Jamcast.Extensibility.Metadata.DlnaInfo.ProfileName">
+            <summary>
+            Gets or sets the DLNA media profile name, or null when no DLNA profile exists for this content type.
+            </summary>
+        </member>
+        <member name="P:Jamcast.Extensibility.Metadata.DlnaInfo.SupportsSeeking">
+            <summary>
+            Gets or sets whether the resource supports seeking.
+            </summary>
+        </member>
+        <member name="P:Jamcast.Extensibility.Metadata.DlnaInfo.IsConversion">
+            <summary>
+            Gets or sets whether the resource is a conversion from its native format.  Set to false if the resource
+            will be presented in the media's native format.
+            </summary>
+        </member>
+        <member name="T:Jamcast.Extensibility.ContentDirectory.InvalidObjectDataException">
+            <summary>
+            You should throw InvalidObjectDataException from within an <see cref="T:Jamcast.Extensibility.ContentDirectory.ObjectRenderer"/> instance when the ObjectData available within that context is invalid.
+            </summary>
+        </member>
+        <member name="M:Jamcast.Extensibility.ContentDirectory.InvalidObjectDataException.#ctor">
+            <summary>
+            Initializes a new instance of the InvalidObjectDataException class.
+            </summary>
+        </member>
+        <member name="M:Jamcast.Extensibility.ContentDirectory.InvalidObjectDataException.#ctor(System.String)">
+            <summary>
+            Initializes a new instance of the InvalidObjectDataException class with a specified error message.
+            </summary>
+            <param name="message">The error message that explains the reason for the exception. </param>
+        </member>
+        <member name="M:Jamcast.Extensibility.ContentDirectory.InvalidObjectDataException.#ctor(System.String,System.Exception)">
+            <summary>
+            Initializes a new instance of the InvalidObjectDataException class with a specified error message and a refrence to the inner exception that is the cause of this exception.
+            </summary>
+            <param name="message">The error message that explains the reason for the exception.</param>
+            <param name="innerException">The exception that is the cause of the current exception.</param>
+        </member>
+        <member name="T:Jamcast.Extensibility.PluginDataException">
+            <summary>
+            This exception is thrown by the Jamcast Server when unable to read from or write to the <see cref="T:Jamcast.Extensibility.PluginDataProvider"/>.
+            </summary>
+        </member>
+        <member name="T:Jamcast.Extensibility.Metadata.ImageResource">
+            <summary>
+            Instances of ImageResource describe an image stream having a distinct location and format.
+            </summary>
+        </member>
+        <member name="M:Jamcast.Extensibility.Metadata.ImageResource.#ctor(Jamcast.Extensibility.Metadata.ResourceLocation,Jamcast.Extensibility.Metadata.MediaFormat)">
+            <summary>
+            Initializes a new instance of the ImageResource class with specified resource location and format.
+            </summary>
+            <param name="location">An instance of ResourceLocation describing the image's location.</param>
+            <param name="format">The format of the image.</param>        
+        </member>
+        <member name="P:Jamcast.Extensibility.Metadata.ImageResource.Location">
+            <summary>
+            Gets an instance of ResourceLocation describing this resource's location.
+            </summary>
+        </member>
+        <member name="P:Jamcast.Extensibility.Metadata.ImageResource.Format">
+            <summary>
+            Gets the MediaFormat of this resource.
+            </summary>
+        </member>
+        <member name="P:Jamcast.Extensibility.Metadata.ImageResource.Length">
+            <summary>
+            Gets or sets this resource's length, in bytes, or 0 if unknown.
+            </summary>
+        </member>
+        <member name="T:Jamcast.Extensibility.Metadata.MediaServerLocation">
+            <summary>
+            Describes a resource location handled by the internal Jamcast media server.  The Type passed via the <paramref name="handler"/> parameter should implement <see cref="T:Jamcast.Extensibility.MediaServer.MediaRequestHandler"/>.  To persist object metadata across the content directory / media server logical boundary, provide keys bundled as System.String[] via the <paramref name="data"/> parameter.
+            </summary>
+        </member>
+        <member name="M:Jamcast.Extensibility.Metadata.MediaServerLocation.#ctor(System.Type,System.String[])">
+            <summary>
+            Creates a new instance of the MediaServerLocation class.
+            </summary>
+            <param name="handler">The Type of your MediaRequestHandler that will service requests at this location.</param>        
+            <param name="data">An array of System.String that can be used to persist this content to the media server.</param>
+        </member>
+        <member name="P:Jamcast.Extensibility.Metadata.MediaServerLocation.Handler">
+            <summary>
+            Gets the Type of the MediaRequestHandler that will service requests at this location.
+            </summary>
+        </member>
+        <member name="P:Jamcast.Extensibility.Metadata.MediaServerLocation.Data">
+            <summary>
+            Gets an array of System.String passed to this instance via its constructor.  These values are persisted to the media server when content at this location is requested.
+            </summary>
+        </member>
+        <member name="T:Jamcast.Extensibility.PluginDataProvider">
+            <summary>
+            Reads and writes simple string key/value pairs or XmlSerialized objects to the Jamcast database.  Use this class from your plugin to store and retrieve settings, cached data, etc.
+            </summary>
+        </member>
+        <member name="M:Jamcast.Extensibility.PluginDataProvider.WriteString(System.String,System.String)">
+            <summary>
+            Writes a string value to the database with the specified key.
+            </summary>
+            <param name="key">The key to store and retrieve this value by.</param>
+            <param name="value">The string to be stored.</param>
+        </member>
+        <member name="M:Jamcast.Extensibility.PluginDataProvider.ReadString(System.String)">
+            <summary>
+            Reads a string value from the database.
+            </summary>
+            <param name="key">The key of the value to retrieve.</param>
+            <returns>The string found in the database for the specified key, or null if the key was not found.</returns>
+        </member>
+        <member name="M:Jamcast.Extensibility.PluginDataProvider.XmlSerialize``1(System.String,System.Object)">
+            <summary>
+            Serializes the specified object and writes it to the database with the provided key.
+            </summary>
+            <typeparam name="T">The Type of object to be serialized as provided in the <paramref name="value"/> parameter.</typeparam>
+            <param name="key">The key to store and retrieve this object by.</param>
+            <param name="value">The object to be serialized and saved to the database.</param>
+        </member>
+        <member name="M:Jamcast.Extensibility.PluginDataProvider.XmlDeserialize``1(System.String)">
+            <summary>
+            Reads a previously serialized object from the database at the specified key.
+            </summary>
+            <typeparam name="T">The Type of object to be deserialized.</typeparam>
+            <param name="key">The key of the object to be retrieved.</param>
+            <returns>An instance of T, or null if nothing was found for this key.</returns>
+        </member>
+        <member name="T:Jamcast.Extensibility.PluginNotLoggedInException">
+            <summary>
+            Plugins that require authentication to an external data provider should throw this exception any time a request 
+            is made but the user has not logged in.
+            </summary>
+        </member>
+        <member name="T:Jamcast.Extensibility.Metadata.MediaFormat">
+            <summary>
+            Describes a known media format.
+            </summary>
+        </member>
+        <member name="M:Jamcast.Extensibility.Metadata.MediaFormat.ReadMetadata(System.IO.Stream,Jamcast.Extensibility.Metadata.IMediaItem)">
+            <summary>
+            Used internally.
+            </summary>
+            <param name="stream">Used internally.</param>
+            <param name="item">Used internally.</param>
+        </member>
+        <member name="M:Jamcast.Extensibility.Metadata.MediaFormat.GetDlnaProfileID(Jamcast.Extensibility.Metadata.IMediaItem)">
+            <summary>
+            Returns the associated DLNA media profile name for a given IMediaItem, or null if no DLNA media profile exists.
+            </summary>
+            <param name="mediaItem">The item to be evaluated.</param>
+            <returns>The associated DLNA media profile name for this MediaFormat.</returns>
+        </member>
+        <member name="M:Jamcast.Extensibility.Metadata.MediaFormat.GetHashCode">
+            <summary>
+            Serves as a hash function for a particular type. 
+            </summary>
+            <returns>A hash code for the current Object.</returns>
+        </member>
+        <member name="M:Jamcast.Extensibility.Metadata.MediaFormat.Equals(System.Object)">
+            <summary>
+            Returns a boolean value indicating whether two objects are considered equal.
+            </summary>
+            <param name="obj">The object to compare to.</param>
+            <returns>A value indicating whether these objects are considered equal.</returns>
+        </member>
+        <member name="M:Jamcast.Extensibility.Metadata.MediaFormat.op_Equality(Jamcast.Extensibility.Metadata.MediaFormat,Jamcast.Extensibility.Metadata.MediaFormat)">
+            <summary>
+            Returns a boolean value indicating whether two objects are considered equal.
+            </summary>
+            <param name="a">The first object to compare</param>
+            <param name="b">The second object to compare</param>
+            <returns>A boolean value indicating whether these two objects are considered equal.</returns>
+        </member>
+        <member name="M:Jamcast.Extensibility.Metadata.MediaFormat.op_Inequality(Jamcast.Extensibility.Metadata.MediaFormat,Jamcast.Extensibility.Metadata.MediaFormat)">
+            <summary>
+            Returns a boolean value indicating whether two objects are considered not equal.
+            </summary>
+            <param name="a">The first object to compare</param>
+            <param name="b">The second object to compare</param>
+            <returns>A boolean value indicating whether these two objects are considered not equal.</returns>
+        </member>
+        <member name="P:Jamcast.Extensibility.Metadata.MediaFormat.AssociatedMimeTypes">
+            <summary>
+            Gets an array of MIME types known to be associated with this media forat.
+            </summary>        
+        </member>
+        <member name="P:Jamcast.Extensibility.Metadata.MediaFormat.NormalizedMimeType">
+            <summary>
+            Gets the normalized or preferred mime type for this media format.
+            </summary>
+        </member>
+        <member name="P:Jamcast.Extensibility.Metadata.MediaFormat.AssociatedExtensions">
+            <summary>
+            Gets an array of file extensions known to be associated with this media format.
+            </summary>
+        </member>
+        <member name="P:Jamcast.Extensibility.Metadata.MediaFormat.IsAudio">
+            <summary>
+            Returns true or false indicating whether or not this format contains audio data.
+            </summary>
+        </member>
+        <member name="P:Jamcast.Extensibility.Metadata.MediaFormat.IsVideo">
+            <summary>
+            Returns true or false indicating whether or not this format contains video data.
+            </summary>
+        </member>
+        <member name="P:Jamcast.Extensibility.Metadata.MediaFormat.IsImage">
+            <summary>
+            Returns true or false indicating whether or not this format contains image data.
+            </summary>
+        </member>
+        <member name="T:Jamcast.Extensibility.Metadata.MediaFormats">
+            <summary>
+            Container class for MediaFormat helper functions.
+            </summary>
+        </member>
+        <member name="M:Jamcast.Extensibility.Metadata.MediaFormats.Identify(System.String)">
+            <summary>
+            Returns an instance of MediaFormat from the provided MIME type.
+            </summary>
+            <param name="mimeType">The MIME type to evaluate.</param>
+            <returns>An instance of MediaFormat associated with the given MIME type, or null if no matching MediaFormat exists.</returns>
+        </member>
+        <member name="P:Jamcast.Extensibility.Metadata.MediaFormats.AIFF">
+            <summary>
+            Audio Interchange File Format
+            </summary>
+        </member>
+        <member name="P:Jamcast.Extensibility.Metadata.MediaFormats.FLAC">
+            <summary>
+            Free Lossless Audio Codec
+            </summary>
+        </member>
+        <member name="P:Jamcast.Extensibility.Metadata.MediaFormats.LPCM">
+            <summary>
+            Linear Pulse-Code Modulation Audio
+            </summary>
+        </member>
+        <member name="P:Jamcast.Extensibility.Metadata.MediaFormats.MPEG4">
+            <summary>
+            MPEG-4 Audio
+            </summary>
+        </member>
+        <member name="P:Jamcast.Extensibility.Metadata.MediaFormats.MP3">
+            <summary>
+            MP3
+            </summary>
+        </member>
+        <member name="P:Jamcast.Extensibility.Metadata.MediaFormats.OGG">
+            <summary>
+            Ogg Vorbis
+            </summary>
+        </member>
+        <member name="P:Jamcast.Extensibility.Metadata.MediaFormats.Shorten">
+            <summary>
+            Shorten
+            </summary>
+        </member>
+        <member name="P:Jamcast.Extensibility.Metadata.MediaFormats.WAV">
+            <summary>
+            Waveform Audio File Format
+            </summary>
+        </member>
+        <member name="P:Jamcast.Extensibility.Metadata.MediaFormats.WindowsMedia">
+            <summary>
+            Windows Media Audio (WMA)
+            </summary>
+        </member>
+        <member name="P:Jamcast.Extensibility.Metadata.MediaFormats.Opus">
+            <summary>
+            Opus
+            </summary>
+        </member>
+        <member name="P:Jamcast.Extensibility.Metadata.MediaFormats.Bitmap">
+            <summary>
+            Bitmap Image
+            </summary>
+        </member>
+        <member name="P:Jamcast.Extensibility.Metadata.MediaFormats.GIF">
+            <summary>
+            Graphics Interchange Format
+            </summary>
+        </member>
+        <member name="P:Jamcast.Extensibility.Metadata.MediaFormats.JPEG">
+            <summary>
+            Joint Photographic Experts Group
+            </summary>
+        </member>
+        <member name="P:Jamcast.Extensibility.Metadata.MediaFormats.PNG">
+            <summary>
+            Portable Network Graphics
+            </summary>
+        </member>
+        <member name="T:Jamcast.Extensibility.Metadata.ContainerType">
+            <summary>
+            These values represent a Content Directory object's type.  Be specific when possible, this affects client interface behavior depending on the hardware.
+            </summary>
+        </member>
+        <member name="F:Jamcast.Extensibility.Metadata.ContainerType.GenericContainer">
+            <summary>
+            Generic container
+            </summary>
+        </member>
+        <member name="F:Jamcast.Extensibility.Metadata.ContainerType.Playlist">
+            <summary>
+            Playlist container
+            </summary>
+        </member>
+        <member name="F:Jamcast.Extensibility.Metadata.ContainerType.Album">
+            <summary>
+            Album container
+            </summary>
+        </member>
+        <member name="F:Jamcast.Extensibility.Metadata.ContainerType.Artist">
+            <summary>
+            Artist container
+            </summary>
+        </member>
+        <member name="F:Jamcast.Extensibility.Metadata.ContainerType.Genre">
+            <summary>
+            Genre container
+            </summary>
+        </member>
+        <member name="T:Jamcast.Extensibility.MediaServer.StreamDataPipe">
+            <summary>
+            Retrieves binary data from an instance of <see cref="T:System.IO.Stream"/>.  Set the Stream property and return this to the media server via <see cref="T:Jamcast.Extensibility.MediaServer.MediaRequestHandler"/>'s RetrieveMedia method.
+            </summary>
+        </member>
+        <member name="T:Jamcast.Extensibility.MediaServer.DataPipeBase">
+            <summary>
+            Data pipes fetch data from an input pipe or external source and make it available either to a parent data pipe or the media server.  Data pipes are connectable and provide an abstract means of fetching and transforming binary data as it flows from source to network stream.  
+            Although you may inherit from this class to create a custom data pipe implementation, <see cref="T:Jamcast.Extensibility.MediaServer.StreamDataPipe"/> is provided and encouraged for use as it should satisfy most plugin requirements.
+            </summary>
+        </member>
+        <member name="M:Jamcast.Extensibility.MediaServer.DataPipeBase.FetchData">
+            <summary>
+            This method is called when this data pipe should being fetching binary data.  The pipe should be written to with repetitive calls to Write().  When this method returns, no more data will be fetched.
+            </summary>
+            <param name="o">Unused.</param>
+        </member>
+        <member name="M:Jamcast.Extensibility.MediaServer.DataPipeBase.OnFetchComplete">
+            <summary>
+            When overriden in a derived class, this function will be called when the instance of DataPipeBase is no longer being read from.
+            </summary>
+        </member>
+        <member name="M:Jamcast.Extensibility.MediaServer.DataPipeBase.Write(System.Byte[],System.Int32,System.Int32)">
+            <summary>
+            Call this method to write data to this DataPipeBase instance.  This function will block when the response buffer is full.
+            </summary>
+            <param name="buffer">An array of System.Byte containing the data to be written.</param>
+            <param name="offset">The starting offset at which data should be copied from the buffer.</param>
+            <param name="length">The number of bytes to write.</param>
+        </member>
+        <member name="M:Jamcast.Extensibility.MediaServer.DataPipeBase.ToString">
+            <summary>
+            Returns a String that represents the current DataPipeBase and its input.
+            </summary>
+            <returns>A string representation of the current DataPipeBase and its input.</returns>
+        </member>
+        <member name="P:Jamcast.Extensibility.MediaServer.DataPipeBase.IsAborting">
+            <summary>
+            Gets or sets the aborting flag.  This is set to True when the data pipe is being shut down.
+            </summary>
+        </member>
+        <member name="P:Jamcast.Extensibility.MediaServer.DataPipeBase.ReverseByteOrder">
+            <summary>
+            Gets or sets a boolean value indicating whether endianess of data being written to this instance of DataPipeBase should be reversed.
+            </summary>
+        </member>
+        <member name="P:Jamcast.Extensibility.MediaServer.DataPipeBase.Name">
+            <summary>
+            Derived classes must override this property accessor to provide a friendly name for this Type.  The friendly name is used in the media server logfile.
+            </summary>
+        </member>
+        <member name="M:Jamcast.Extensibility.MediaServer.StreamDataPipe.#ctor">
+            <summary>
+            Initializes a new instance of the StreamDataPipe class with a specified friendly (log) name and input stream.
+            </summary>
+        </member>
+        <member name="M:Jamcast.Extensibility.MediaServer.StreamDataPipe.#ctor(System.String,System.IO.Stream)">
+            <summary>
+            Initializes a new instance of the StreamDataPipe class with a specified friendly (log) name and input stream.
+            </summary>
+            <param name="name">A friendly name as this instance will be identified in the log.</param>
+            <param name="stream">A stream that will act as the input to this data pipe.</param>
+        </member>
+        <member name="M:Jamcast.Extensibility.MediaServer.StreamDataPipe.FetchData">
+            <summary>
+            This method is called when this data pipe should being fetching binary data.  The pipe should be written to with repetitive calls to Write().  When this method returns, the media server will assume there is no more data to be fetched.
+            </summary>       
+        </member>
+        <member name="P:Jamcast.Extensibility.MediaServer.StreamDataPipe.Stream">
+            <summary>
+            Gets or sets the instance of System.IO.Stream that will be read from.
+            </summary>
+        </member>
+        <member name="P:Jamcast.Extensibility.MediaServer.StreamDataPipe.Name">
+            <summary>
+            Gets the logfile-friendly name for this DataPipe.
+            </summary>
+        </member>
+        <member name="T:Jamcast.Extensibility.ContentDirectory.ContainerRendererAttribute">
+            <summary>
+            This attribute registers a Content Directory object renderer with the server and declares the type of object it emits metadata for.
+            </summary>
+        </member>
+        <member name="P:Jamcast.Extensibility.ContentDirectory.ContainerRendererAttribute.ContainerType">
+            <summary>
+            Gets the ServerObjectType value defined by this attribute instance.
+            </summary>
+        </member>
+        <member name="T:Jamcast.Extensibility.UI.Dialogs.Contracts.IDialogConfig">
+            <summary>
+            Not used so far...
+            </summary>
+        </member>
+        <member name="T:Jamcast.Extensibility.UI.Dialogs.DialogBaseControl">
+            <summary>
+            Interaction logic for DialogBaseControl.xaml
+            </summary>
+        </member>
+        <member name="M:Jamcast.Extensibility.UI.Dialogs.DialogBaseControl.InitializeComponent">
+            <summary>
+            InitializeComponent
+            </summary>
+        </member>
+        <member name="T:Jamcast.Extensibility.UI.Dialogs.WaitAnimation">
+            <summary>
+            WaitAnimation
+            </summary>
+        </member>
+        <member name="M:Jamcast.Extensibility.UI.Dialogs.WaitAnimation.InitializeComponent">
+            <summary>
+            InitializeComponent
+            </summary>
+        </member>
+        <member name="M:Jamcast.Extensibility.UI.Dialogs.WaitProgressDialogControl.InitializeComponent">
+            <summary>
+            InitializeComponent
+            </summary>
+        </member>
+        <member name="T:XamlGeneratedNamespace.GeneratedInternalTypeHelper">
+            <summary>
+            GeneratedInternalTypeHelper
+            </summary>
+        </member>
+        <member name="M:XamlGeneratedNamespace.GeneratedInternalTypeHelper.CreateInstance(System.Type,System.Globalization.CultureInfo)">
+            <summary>
+            CreateInstance
+            </summary>
+        </member>
+        <member name="M:XamlGeneratedNamespace.GeneratedInternalTypeHelper.GetPropertyValue(System.Reflection.PropertyInfo,System.Object,System.Globalization.CultureInfo)">
+            <summary>
+            GetPropertyValue
+            </summary>
+        </member>
+        <member name="M:XamlGeneratedNamespace.GeneratedInternalTypeHelper.SetPropertyValue(System.Reflection.PropertyInfo,System.Object,System.Object,System.Globalization.CultureInfo)">
+            <summary>
+            SetPropertyValue
+            </summary>
+        </member>
+        <member name="M:XamlGeneratedNamespace.GeneratedInternalTypeHelper.CreateDelegate(System.Type,System.Object,System.String)">
+            <summary>
+            CreateDelegate
+            </summary>
+        </member>
+        <member name="M:XamlGeneratedNamespace.GeneratedInternalTypeHelper.AddEventHandler(System.Reflection.EventInfo,System.Object,System.Delegate)">
+            <summary>
+            AddEventHandler
+            </summary>
+        </member>
+    </members>
+</doc>

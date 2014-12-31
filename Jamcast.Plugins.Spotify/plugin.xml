@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<plugin xmlns="http://sdstechnologies.com/jamcast/plugin/manifest/2.0">
+	<providerID>{FA35F157-3A99-4640-BC00-606F51B0CC21}</providerID>
+	<name>Spotify</name>
+	<description>Listen to and discover music from the world's premier music streaming service.  Requires a Spotify Premium subscription.</description>
+	<publisherName>Software Development Solutions, Inc.</publisherName>
+	<publisherUrl>http://getjamcast.com</publisherUrl>
+	<iconResourceName>Jamcast.Plugins.Spotify.spotify-logo.png</iconResourceName>
+	<assemblyFileName>Jamcast.Plugins.Spotify.dll</assemblyFileName>
+	<files>
+		<file>libspotify.dll</file>
+		<file>libspotifydotnet.dll</file>
+	</files>
+</plugin>
