@@ -142,6 +142,7 @@
     <Content Include="LICENSE.txt" />
     <Content Include="plugin.xml">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      <SubType>Designer</SubType>
     </Content>
     <EmbeddedResource Include="spotify-logo.png" />
   </ItemGroup>
@@ -176,14 +177,22 @@
     <None Include="packages.config" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
-  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
-       Other similar extension points exist, see Microsoft.Common.targets.
-  <Target Name="BeforeBuild">
-  </Target>
-  <Target Name="AfterBuild">
-  </Target>
-  -->
   <PropertyGroup>
     <PostBuildEvent>IF EXIST "$(ProjectDir)postbuild.bat" call "$(ProjectDir)postbuild.bat" "$(TargetPath)"</PostBuildEvent>
   </PropertyGroup>
+  <Import Condition="Exists('$(MSBuildExtensionsPath)\Jamcast\Jamcast.SDK.targets')" Project="$(MSBuildExtensionsPath)\Jamcast\Jamcast.SDK.targets" />
+  <Target Name="AfterClean">
+    <CallTarget Targets="CleanJPL" />
+  </Target>
+  <Target Name="AfterBuild">
+    <CallTarget Targets="MakeJPL" />
+  </Target>
+  <Target Condition="Exists('$(OutDir)\$(AssemblyName).jpl')" Name="CleanJPL">
+    <Message Text="Cleaning up JPL file..." Importance="high" />
+    <Delete Files="$(OutDir)\$(AssemblyName).jpl" ContinueOnError="true" />
+  </Target>
+  <Target Condition="Exists('$(MSBuildExtensionsPath)\Jamcast\Jamcast.SDK.targets')" Name="MakeJPL">
+    <Message Text="Making JPL file..." Importance="high" />
+    <MakePlugin ManifestPath="$(OutDir)plugin.xml" OutputPath="$(OutDir)\$(AssemblyName).jpl" />
+  </Target>
 </Project>
