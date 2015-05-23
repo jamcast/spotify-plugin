@@ -574,9 +574,9 @@ namespace Jamcast.Plugins.Spotify
                 {
                     try
                     {
-                        //libspotify.sp_error err = libspotify.sp_session_player_unload(Session.SessionPtr);
-                        //err = libspotify.sp_session_logout(Session.SessionPtr);
-                        //err = libspotify.sp_session_release(Session.SessionPtr);
+                        libspotify.sp_error err = libspotify.sp_session_player_unload(Session.SessionPtr);
+                        err = libspotify.sp_session_logout(Session.SessionPtr);
+                        err = libspotify.sp_session_release(Session.SessionPtr);
                     }
                     catch (Exception ex)
                     {
